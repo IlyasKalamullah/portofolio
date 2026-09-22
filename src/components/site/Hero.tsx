@@ -1,6 +1,7 @@
 import { ArrowDown, ArrowUpRight, Download, MapPin } from "lucide-react";
 import type { Profile } from "@prisma/client";
 import { Socials } from "./Socials";
+import { HeroGrid } from "./HeroGrid";
 import { Typewriter } from "./Typewriter";
 import { CountUp } from "./CountUp";
 import { Magnetic } from "./Magnetic";
@@ -15,7 +16,7 @@ export function Hero({ profile }: { profile: Profile }) {
   const seq = (n: number) => ({ "--d": `${nameEnd + n * 120}ms` }) as React.CSSProperties;
   return (
     <section id="top" className="relative overflow-hidden pb-16 pt-36 sm:pt-44">
-      <div className="grid-bg pointer-events-none absolute inset-0" />
+      <HeroGrid />
       <div className="pointer-events-none absolute -top-32 left-1/2 h-[480px] w-[480px] -translate-x-1/2 rounded-full bg-accent/20 blur-[140px]" />
       <div className="pointer-events-none absolute right-0 top-40 h-72 w-72 rounded-full bg-violet-600/20 blur-[120px]" />
 
