@@ -3,6 +3,7 @@
 import { Children, useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import clsx from "clsx";
+import { delay } from "@/lib/motion";
 
 /**
  * Carousel horizontal: swipe di HP, tombol panah + titik navigasi di desktop.
@@ -73,7 +74,7 @@ export function Carousel({
         className="no-scrollbar relative flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth pb-2 outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
       >
         {slides.map((s, i) => (
-          <div key={i} className={clsx("flex shrink-0 snap-start", slideClassName)} aria-roledescription="slide" aria-label={`${i + 1} dari ${slides.length}`}>
+          <div key={i} style={delay(i % 4, 110)} className={clsx("reveal flex shrink-0 snap-start", slideClassName)} aria-roledescription="slide" aria-label={`${i + 1} dari ${slides.length}`}>
             {s}
           </div>
         ))}

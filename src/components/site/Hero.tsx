@@ -1,9 +1,18 @@
 import { ArrowDown, ArrowUpRight, Download, MapPin } from "lucide-react";
 import type { Profile } from "@prisma/client";
 import { Socials } from "./Socials";
+import { Typewriter } from "./Typewriter";
+import { CountUp } from "./CountUp";
+import { Magnetic } from "./Magnetic";
+import { splitRoles, primaryRole } from "@/lib/text";
+import { delay } from "@/lib/motion";
 
 export function Hero({ profile }: { profile: Profile }) {
   const [first, ...rest] = profile.name.split(" ");
+  const roles = splitRoles(profile.headline);
+  // urutan intro: badge → "Halo" → nama (huruf per huruf) → headline → tagline → tombol
+  const nameEnd = 250 + first.length * 45 + 250;
+  const seq = (n: number) => ({ "--d": `${nameEnd + n * 120}ms` }) as React.CSSProperties;
   return (
     <section id="top" className="relative overflow-hidden pb-16 pt-36 sm:pt-44">
       <div className="grid-bg pointer-events-none absolute inset-0" />
@@ -13,7 +22,7 @@ export function Hero({ profile }: { profile: Profile }) {
       <div className="relative mx-auto max-w-6xl px-5">
         <div className="grid items-center gap-12 lg:grid-cols-[1.4fr_1fr]">
           <div>
-            <div className="reveal mb-6 flex flex-wrap items-center gap-3">
+            <div className="intro mb-6 flex flex-wrap items-center gap-3">
               {profile.available && (
                 <span className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-medium text-accent">
                   <span className="relative flex h-2 w-2">
@@ -28,33 +37,47 @@ export function Hero({ profile }: { profile: Profile }) {
               )}
             </div>
 
-            <p className="reveal font-mono text-sm text-zinc-400">Halo, saya 👋</p>
-            <h1 className="reveal mt-2 font-display text-5xl font-bold leading-[0.95] tracking-tight sm:text-7xl lg:text-8xl">
-              {first}
+            <p className="intro font-mono text-sm text-zinc-400" style={delay(1)}>Halo, saya <span className="inline-block origin-[70%_70%] animate-[wave_2.2s_ease-in-out_1s_2]">👋</span></p>
+            <h1 className="mt-2 font-display text-5xl font-bold leading-[0.95] tracking-tight sm:text-7xl lg:text-8xl" aria-label={profile.name}>
+              <span className="rise-line" aria-hidden>
+                {Array.from(first).map((ch, i) => (
+                  <span key={i} className="rise" style={{ "--d": `${250 + i * 45}ms` } as React.CSSProperties}>{ch}</span>
+                ))}
+              </span>
               {rest.length > 0 && (
                 <>
                   <br />
-                  <span className="bg-gradient-to-r from-accent via-lime-200 to-white bg-clip-text text-transparent">{rest.join(" ")}</span>
+                  <span className="rise-line" aria-hidden>
+                    <span className="rise bg-gradient-to-r from-accent via-lime-200 to-white bg-clip-text text-transparent" style={{ "--d": `${nameEnd - 150}ms` } as React.CSSProperties}>
+                      {rest.join(" ")}
+                    </span>
+                  </span>
                 </>
               )}
             </h1>
-            <p className="reveal mt-6 font-display text-xl text-white sm:text-2xl">{profile.headline}</p>
-            {profile.tagline && <p className="reveal mt-4 max-w-xl text-base leading-relaxed text-zinc-400 sm:text-lg">{profile.tagline}</p>}
+            <p className="intro mt-6 flex min-h-[1.5em] items-center font-display text-xl text-white sm:text-2xl" style={seq(0)}>
+              <Typewriter words={roles} />
+            </p>
+            {profile.tagline && <p className="intro mt-4 max-w-xl text-base leading-relaxed text-zinc-400 sm:text-lg" style={seq(1)}>{profile.tagline}</p>}
 
-            <div className="reveal mt-8 flex flex-wrap items-center gap-3">
-              <a href="#projects" className="group inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-black transition hover:bg-accent-soft">
-                Lihat karya saya <ArrowUpRight size={18} className="transition group-hover:rotate-45" />
-              </a>
-              {profile.resumeUrl && (
-                <a href={profile.resumeUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full border border-white/15 px-6 py-3 text-sm font-semibold transition hover:border-white/40 hover:bg-white/5">
-                  <Download size={16} /> Unduh CV
+            <div className="intro mt-8 flex flex-wrap items-center gap-3" style={seq(2)}>
+              <Magnetic>
+                <a href="#projects" className="group inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-black shadow-[0_0_0_0_rgba(198,244,50,.5)] transition hover:bg-accent-soft hover:shadow-[0_0_30px_-4px_rgba(198,244,50,.6)]">
+                  Lihat karya saya <ArrowUpRight size={18} className="transition group-hover:rotate-45" />
                 </a>
+              </Magnetic>
+              {profile.resumeUrl && (
+                <Magnetic>
+                  <a href={profile.resumeUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full border border-white/15 px-6 py-3 text-sm font-semibold transition hover:border-white/40 hover:bg-white/5">
+                    <Download size={16} /> Unduh CV
+                  </a>
+                </Magnetic>
               )}
             </div>
-            <div className="reveal mt-8"><Socials profile={profile} /></div>
+            <div className="intro mt-8" style={seq(3)}><Socials profile={profile} /></div>
           </div>
 
-          <div className="reveal relative mx-auto w-full max-w-sm">
+          <div className="intro relative mx-auto w-full max-w-sm" style={seq(0)}>
             <div className="absolute -inset-4 rounded-[2.5rem] bg-gradient-to-br from-accent/40 via-transparent to-violet-500/30 opacity-60 blur-2xl" />
             <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] border border-white/10 bg-ink-800">
               {profile.avatarUrl ? (
@@ -67,15 +90,15 @@ export function Hero({ profile }: { profile: Profile }) {
               )}
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-5">
                 <p className="font-display font-semibold">{profile.name}</p>
-                <p className="text-sm text-zinc-300">{profile.headline}</p>
+                <p className="text-sm text-zinc-300">{primaryRole(profile.headline)}</p>
               </div>
             </div>
             <div className="card absolute -left-6 top-10 hidden animate-float px-4 py-3 sm:block">
-              <p className="font-display text-2xl font-bold text-accent">{profile.yearsExperience}+</p>
+              <p className="font-display text-2xl font-bold text-accent"><CountUp value={profile.yearsExperience} />+</p>
               <p className="text-xs text-zinc-400">Tahun pengalaman</p>
             </div>
             <div className="card absolute -right-4 bottom-24 hidden animate-float px-4 py-3 [animation-delay:1.5s] sm:block">
-              <p className="font-display text-2xl font-bold text-accent">{profile.projectsDone}+</p>
+              <p className="font-display text-2xl font-bold text-accent"><CountUp value={profile.projectsDone} />+</p>
               <p className="text-xs text-zinc-400">Proyek selesai</p>
             </div>
           </div>

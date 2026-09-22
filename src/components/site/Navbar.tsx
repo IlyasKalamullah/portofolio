@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import clsx from "clsx";
+import { Magnetic } from "./Magnetic";
 
 const links = [
   { href: "#about", label: "Tentang" },
@@ -43,7 +44,9 @@ export function Navbar({ name }: { name: string }) {
             </li>
           ))}
         </ul>
-        <a href="#contact" className="hidden rounded-full bg-white px-5 py-2 text-sm font-semibold text-black transition hover:bg-accent md:block">Hubungi saya</a>
+        <Magnetic className="hidden md:inline-block" strength={0.25}>
+          <a href="#contact" className="block rounded-full bg-white px-5 py-2 text-sm font-semibold text-black transition hover:bg-accent">Hubungi saya</a>
+        </Magnetic>
         <button className="p-2 md:hidden" onClick={() => setOpen(!open)} aria-label="Menu">{open ? <X /> : <Menu />}</button>
       </nav>
       {open && (

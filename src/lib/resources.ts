@@ -125,7 +125,7 @@ export const resources: Resource[] = [
 
 export const profileFields: Field[] = [
   { name: "name", label: "Nama lengkap", type: "text", required: true, half: true },
-  { name: "headline", label: "Profesi / headline", type: "text", required: true, half: true, placeholder: "Full-Stack Developer" },
+  { name: "headline", label: "Profesi / headline", type: "text", required: true, half: true, placeholder: "Full-Stack Developer | UI Enthusiast", help: "Pisahkan beberapa peran dengan | untuk efek mengetik bergantian" },
   { name: "tagline", label: "Tagline hero", type: "textarea", placeholder: "Kalimat singkat di bagian atas website" },
   { name: "bio", label: "Tentang saya", type: "textarea", help: "Pisahkan paragraf dengan baris kosong" },
   { name: "avatarUrl", label: "Foto profil", type: "image" },

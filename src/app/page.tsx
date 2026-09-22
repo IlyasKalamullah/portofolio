@@ -11,6 +11,8 @@ import { Contact } from "@/components/site/Contact";
 import { Footer } from "@/components/site/Footer";
 import { SectionTitle } from "@/components/site/SectionTitle";
 import { RevealObserver } from "@/components/site/Reveal";
+import { ScrollProgress } from "@/components/site/ScrollProgress";
+import { primaryRole } from "@/lib/text";
 
 // Halaman di-cache agar cepat; otomatis diperbarui setiap kali data disimpan di admin
 export const revalidate = 3600;
@@ -18,9 +20,9 @@ export const revalidate = 3600;
 export async function generateMetadata(): Promise<Metadata> {
   const p = await getProfile();
   return {
-    title: { absolute: `${p.name} — ${p.headline}` },
+    title: { absolute: `${p.name} — ${primaryRole(p.headline)}` },
     description: p.tagline || p.bio.slice(0, 160),
-    openGraph: { title: `${p.name} — ${p.headline}`, description: p.tagline, images: p.avatarUrl ? [p.avatarUrl] : [] },
+    openGraph: { title: `${p.name} — ${primaryRole(p.headline)}`, description: p.tagline, images: p.avatarUrl ? [p.avatarUrl] : [] },
   };
 }
 
@@ -29,6 +31,7 @@ export default async function Home() {
 
   return (
     <div className="grain">
+      <ScrollProgress />
       <Navbar name={profile.name} />
       <main>
         <Hero profile={profile} />
