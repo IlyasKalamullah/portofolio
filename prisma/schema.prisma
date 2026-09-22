@@ -1,0 +1,110 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["queryCompiler", "driverAdapters"]
+  engineType      = "client"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Profile {
+  id              Int      @id @default(1)
+  name            String   @default("Nama Anda")
+  headline        String   @default("Full-Stack Developer")
+  tagline         String   @default("")
+  bio             String   @default("")
+  avatarUrl       String?
+  resumeUrl       String?
+  email           String?
+  phone           String?
+  location        String?
+  available       Boolean  @default(true)
+  github          String?
+  linkedin        String?
+  instagram       String?
+  twitter         String?
+  website         String?
+  yearsExperience Int      @default(0)
+  projectsDone    Int      @default(0)
+  happyClients    Int      @default(0)
+  updatedAt       DateTime @updatedAt
+}
+
+model Project {
+  id        Int      @id @default(autoincrement())
+  title     String
+  slug      String   @unique
+  summary   String   @default("")
+  content   String   @default("")
+  imageUrl  String?
+  category  String?
+  tags      String[] @default([])
+  liveUrl   String?
+  repoUrl   String?
+  year      String?
+  featured  Boolean  @default(false)
+  published Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Experience {
+  id          Int      @id @default(autoincrement())
+  company     String
+  role        String
+  type        String?
+  location    String?
+  logoUrl     String?
+  startDate   String
+  endDate     String?
+  current     Boolean  @default(false)
+  description String   @default("")
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+}
+
+model Education {
+  id          Int      @id @default(autoincrement())
+  school      String
+  degree      String
+  field       String?
+  startDate   String
+  endDate     String?
+  description String   @default("")
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+}
+
+model Skill {
+  id       Int     @id @default(autoincrement())
+  name     String
+  category String  @default("Lainnya")
+  level    Int     @default(80)
+  iconUrl  String?
+  order    Int     @default(0)
+}
+
+model Certificate {
+  id         Int      @id @default(autoincrement())
+  title      String
+  issuer     String
+  date       String?
+  credentialUrl String?
+  imageUrl   String?
+  order      Int      @default(0)
+  createdAt  DateTime @default(now())
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String
+  subject   String?
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
