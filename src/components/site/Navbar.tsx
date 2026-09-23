@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import clsx from "clsx";
 import { Magnetic } from "./Magnetic";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const links = [
   { href: "#about", label: "Tentang" },
@@ -45,10 +46,13 @@ export function Navbar({ name }: { name: string }) {
             </li>
           ))}
         </ul>
-        <Magnetic className="hidden md:inline-block" strength={0.25}>
-          <a href="#contact" className="block rounded-full bg-white px-5 py-2 text-sm font-semibold text-black transition hover:bg-accent">Hubungi saya</a>
-        </Magnetic>
-        <button className="p-2 md:hidden" onClick={() => setOpen(!open)} aria-label="Menu">{open ? <X /> : <Menu />}</button>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <Magnetic className="hidden md:inline-block" strength={0.25}>
+            <a href="#contact" className="block rounded-full bg-white px-5 py-2 text-sm font-semibold text-ink transition hover:bg-accent hover:text-black">Hubungi saya</a>
+          </Magnetic>
+          <button className="p-2 md:hidden" onClick={() => setOpen(!open)} aria-label="Menu">{open ? <X /> : <Menu />}</button>
+        </div>
       </nav>
       {open && (
         <div className="mx-auto mt-2 max-w-5xl rounded-3xl border border-white/10 bg-ink-900/95 p-3 backdrop-blur-xl md:hidden">

@@ -4,6 +4,7 @@ import { getSession } from "@/lib/session";
 import { getProfile } from "@/lib/data";
 import { HeroGrid } from "@/components/site/HeroGrid";
 import { LoginCard } from "./LoginCard";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Login Admin" };
@@ -22,6 +23,9 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
       <HeroGrid />
       <div className="pointer-events-none absolute -top-40 left-1/2 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-accent/20 blur-[130px]" />
       <div className="pointer-events-none absolute -bottom-40 right-0 h-80 w-80 rounded-full bg-violet-600/20 blur-[120px]" />
+      <div className="absolute right-4 top-4 z-10">
+        <ThemeToggle className="bg-ink-800/60 backdrop-blur" />
+      </div>
       <LoginCard next={next ?? ""} firstName={firstName} />
     </div>
   );

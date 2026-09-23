@@ -49,7 +49,7 @@ export function Hero({ profile }: { profile: Profile }) {
                 <>
                   <br />
                   <span className="rise-line" aria-hidden>
-                    <span className="rise bg-gradient-to-r from-accent via-lime-200 to-white bg-clip-text text-transparent" style={{ "--d": `${nameEnd - 150}ms` } as React.CSSProperties}>
+                    <span className="rise bg-gradient-to-r from-accent via-lime-200 to-white bg-clip-text text-transparent light:from-lime-600 light:via-lime-500 light:to-emerald-700" style={{ "--d": `${nameEnd - 150}ms` } as React.CSSProperties}>
                       {rest.join(" ")}
                     </span>
                   </span>
@@ -90,8 +90,8 @@ export function Hero({ profile }: { profile: Profile }) {
                 </div>
               )}
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-5">
-                <p className="font-display font-semibold">{profile.name}</p>
-                <p className="text-sm text-zinc-300">{primaryRole(profile.headline)}</p>
+                <p className="font-display font-semibold text-[#fff]">{profile.name}</p>
+                <p className="text-sm text-[#d4d4d8]">{primaryRole(profile.headline)}</p>
               </div>
             </div>
             <div className="card absolute -left-6 top-10 hidden animate-float px-4 py-3 sm:block">

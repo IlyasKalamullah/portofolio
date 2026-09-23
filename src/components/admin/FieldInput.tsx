@@ -90,7 +90,7 @@ function ImageField({ id, name, initial }: { id: string; name: string; initial: 
               // eslint-disable-next-line @next/next/no-img-element
               <img loading="lazy" decoding="async" src={url} alt="" className="h-full w-full object-cover" />
             )}
-            <button type="button" onClick={() => setUrl("")} className="absolute right-1 top-1 rounded-full bg-black/70 p-1 text-white hover:bg-black" aria-label="Hapus gambar">
+            <button type="button" onClick={() => setUrl("")} className="absolute right-1 top-1 rounded-full bg-black/70 p-1 text-[#fff] hover:bg-black" aria-label="Hapus gambar">
               <X size={12} />
             </button>
           </>

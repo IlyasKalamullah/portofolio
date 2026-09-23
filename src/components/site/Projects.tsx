@@ -52,7 +52,7 @@ export function ProjectsGrid({ projects }: { projects: ProjectCard[] }) {
                 <div className="grid h-full place-items-center bg-gradient-to-br from-ink-700 to-ink-900 px-4 text-center font-display text-3xl font-bold text-white/10">{p.title}</div>
               )}
               {p.featured && (
-                <span className="absolute left-4 top-4 inline-flex items-center gap-1 rounded-full bg-black/70 px-3 py-1 text-xs font-medium text-accent backdrop-blur">
+                <span className="absolute left-4 top-4 inline-flex items-center gap-1 rounded-full bg-black/70 px-3 py-1 text-xs font-medium text-[#c6f432] backdrop-blur">
                   <Star size={12} className="fill-accent" /> Unggulan
                 </span>
               )}

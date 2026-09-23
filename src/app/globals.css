@@ -2,7 +2,37 @@
 @tailwind components;
 @tailwind utilities;
 
-:root { color-scheme: dark; }
+:root {
+  color-scheme: dark;
+  /* ===== Tema gelap (default) ===== */
+  --ink: 9 9 11; --ink-900: 12 12 15; --ink-800: 19 19 24; --ink-700: 28 28 35; --ink-600: 42 42 51;
+  --fg: 255 255 255;
+  --accent: 198 244 50; --accent-soft: 217 255 107; --accent-text: 198 244 50;
+  --zinc-100: 244 244 245; --zinc-200: 228 228 231; --zinc-300: 212 212 216; --zinc-400: 161 161 170;
+  --zinc-500: 113 113 122; --zinc-600: 82 82 91; --zinc-700: 63 63 70; --zinc-800: 39 39 42; --zinc-900: 24 24 27;
+  --grid-line: rgba(255,255,255,.055);
+  --grid-accent: rgba(198,244,50,.45);
+  --spot: rgba(198,244,50,.10);
+  --glass-border: rgba(255,255,255,.08);
+}
+html.light {
+  color-scheme: light;
+  /* ===== Tema terang ===== */
+  --ink: 247 247 243; --ink-900: 239 239 234; --ink-800: 255 255 255; --ink-700: 232 232 226; --ink-600: 218 218 211;
+  --fg: 12 12 14;
+  --accent: 190 242 40; --accent-soft: 170 224 30; --accent-text: 77 124 15;
+  --zinc-100: 24 24 27; --zinc-200: 39 39 42; --zinc-300: 55 55 62; --zinc-400: 82 82 91;
+  --zinc-500: 105 105 114; --zinc-600: 150 150 160; --zinc-700: 200 200 206; --zinc-800: 228 228 231; --zinc-900: 244 244 245;
+  --grid-line: rgba(0,0,0,.06);
+  --grid-accent: rgba(101,163,13,.55);
+  --spot: rgba(132,204,22,.14);
+  --glass-border: rgba(0,0,0,.08);
+}
+html.light .card { box-shadow: 0 1px 2px rgba(0,0,0,.04), 0 12px 32px -16px rgba(0,0,0,.12); }
+html.light .grain::before { opacity: .02; }
+
+/* Animasi ganti tema: lingkaran membesar dari tombol (View Transitions API) */
+::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
 
 html { scroll-behavior: smooth; }
 body { @apply bg-ink text-zinc-100 antialiased; }
@@ -18,13 +48,13 @@ body { @apply bg-ink text-zinc-100 antialiased; }
 .grid-lines, .grid-lines-accent { background-size: 56px 56px; }
 .grid-lines {
   background-image:
-    linear-gradient(to right, rgba(255,255,255,.055) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255,255,255,.055) 1px, transparent 1px);
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
 }
 .grid-lines-accent {
   background-image:
-    linear-gradient(to right, rgba(198,244,50,.45) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(198,244,50,.45) 1px, transparent 1px);
+    linear-gradient(to right, var(--grid-accent) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-accent) 1px, transparent 1px);
 }
 /* geser tepat 1 kotak agar loop mulus */
 .grid-move { animation: grid-move 6s linear infinite; will-change: transform; }
@@ -72,7 +102,7 @@ body { @apply bg-ink text-zinc-100 antialiased; }
 .spotlight { position: relative; overflow: hidden; }
 .spotlight::after {
   content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .3s;
-  background: radial-gradient(400px circle at var(--x, 50%) var(--y, 50%), rgba(198,244,50,.10), transparent 40%);
+  background: radial-gradient(400px circle at var(--x, 50%) var(--y, 50%), var(--spot), transparent 40%);
 }
 .spotlight:hover::after { opacity: 1; }
 
@@ -84,7 +114,7 @@ body { @apply bg-ink text-zinc-100 antialiased; }
   --glow: #c6f432;
   background:
     conic-gradient(from var(--angle), transparent 0 62%, color-mix(in srgb, var(--glow) 35%, transparent) 75%, var(--glow) 86%, transparent 94%),
-    rgba(255,255,255,.08);
+    var(--glass-border);
   animation: spin-angle 4s linear infinite;
   box-shadow: 0 30px 80px -20px rgba(0,0,0,.8), 0 0 60px -30px var(--glow);
   transition: box-shadow .4s;

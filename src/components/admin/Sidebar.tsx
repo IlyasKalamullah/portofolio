@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Award, Briefcase, ExternalLink, FolderKanban, GraduationCap, LayoutDashboard, LogOut, Mail, Menu, Sparkles, User, X } from "lucide-react";
 import clsx from "clsx";
 import { logout } from "@/app/admin/actions";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const nav = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -24,10 +25,13 @@ export function Sidebar({ unread, email }: { unread: number; email: string }) {
 
   const content = (
     <div className="flex h-full flex-col">
-      <Link href="/admin" className="mb-8 flex items-center gap-2 px-3 font-display text-lg font-bold">
+      <div className="mb-8 flex items-center justify-between gap-1">
+        <Link href="/admin" className="flex items-center gap-2 whitespace-nowrap px-2 font-display text-base font-bold">
         <span className="grid h-8 w-8 place-items-center rounded-lg bg-accent text-black">P</span>
         Admin Porto
       </Link>
+        <ThemeToggle className="hidden h-9 w-9 lg:grid" />
+      </div>
       <nav className="flex-1 space-y-1">
         {nav.map(({ href, label, icon: Icon }) => {
           const active = href === "/admin" ? path === href : path.startsWith(href);
@@ -68,7 +72,10 @@ export function Sidebar({ unread, email }: { unread: number; email: string }) {
     <>
       <div className="sticky top-0 z-30 flex items-center justify-between border-b border-white/5 bg-ink/90 px-4 py-3 backdrop-blur lg:hidden">
         <span className="font-display font-bold">Admin Porto</span>
-        <button onClick={() => setOpen(true)} aria-label="Buka menu"><Menu /></button>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <button onClick={() => setOpen(true)} aria-label="Buka menu"><Menu /></button>
+        </div>
       </div>
       {open && (
         <div className="fixed inset-0 z-40 bg-black/60 lg:hidden" onClick={() => setOpen(false)}>

@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import plugin from "tailwindcss/plugin";
 
 export default {
   content: ["./src/**/*.{ts,tsx}"],
@@ -8,10 +9,19 @@ export default {
         sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
         display: ["'Space Grotesk'", "Inter", "ui-sans-serif", "sans-serif"],
       },
+      // Semua warna memakai variabel CSS (lihat globals.css) agar bisa berganti tema terang/gelap
       colors: {
-        ink: { DEFAULT: "#09090b", 900: "#0c0c0f", 800: "#131318", 700: "#1c1c23", 600: "#2a2a33" },
-        accent: { DEFAULT: "#c6f432", soft: "#d9ff6b" },
+        ink: { DEFAULT: "rgb(var(--ink) / <alpha-value>)", 900: "rgb(var(--ink-900) / <alpha-value>)", 800: "rgb(var(--ink-800) / <alpha-value>)", 700: "rgb(var(--ink-700) / <alpha-value>)", 600: "rgb(var(--ink-600) / <alpha-value>)" },
+        accent: { DEFAULT: "rgb(var(--accent) / <alpha-value>)", soft: "rgb(var(--accent-soft) / <alpha-value>)" },
+        // "white" = warna teks/garis utama (putih di mode gelap, hitam di mode terang)
+        white: "rgb(var(--fg) / <alpha-value>)",
+        zinc: {
+          100: "rgb(var(--zinc-100) / <alpha-value>)", 200: "rgb(var(--zinc-200) / <alpha-value>)", 300: "rgb(var(--zinc-300) / <alpha-value>)", 400: "rgb(var(--zinc-400) / <alpha-value>)",
+          500: "rgb(var(--zinc-500) / <alpha-value>)", 600: "rgb(var(--zinc-600) / <alpha-value>)", 700: "rgb(var(--zinc-700) / <alpha-value>)", 800: "rgb(var(--zinc-800) / <alpha-value>)", 900: "rgb(var(--zinc-900) / <alpha-value>)",
+        },
       },
+      // teks aksen dibuat lebih gelap di mode terang agar tetap terbaca
+      textColor: { accent: { DEFAULT: "rgb(var(--accent-text) / <alpha-value>)", soft: "rgb(var(--accent-soft) / <alpha-value>)" } },
       keyframes: {
         marquee: { from: { transform: "translateX(0)" }, to: { transform: "translateX(-50%)" } },
         float: { "0%,100%": { transform: "translateY(0)" }, "50%": { transform: "translateY(-10px)" } },
@@ -35,5 +45,8 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    // varian `light:` → gaya khusus mode terang, mis. light:from-lime-600
+    plugin(({ addVariant }) => addVariant("light", "html.light &")),
+  ],
 } satisfies Config;

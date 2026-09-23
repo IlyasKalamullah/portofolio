@@ -51,7 +51,7 @@ export default async function Home() {
         <Skills skills={skills} />
         <Certificates certificates={certificates} />
         <section id="games" className="mx-auto max-w-6xl scroll-mt-24 px-5 py-24">
-          <SectionTitle label="Mini game" title="Istirahat sejenak 🎮" desc="Dua mini game buatan saya sendiri. Coba kalahkan skor terbaikmu!" />
+          <SectionTitle label="Mini game" title="Istirahat sejenak" desc="Dua mini game buatan saya sendiri. Coba kalahkan skor terbaikmu!" />
           <div className="reveal">
             <GamesSection />
           </div>

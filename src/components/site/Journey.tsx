@@ -19,7 +19,7 @@ export function Journey({ experiences, education }: { experiences: Experience[];
                   <div className="flex flex-wrap items-start gap-4">
                     {e.logoUrl && (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img loading="lazy" decoding="async" src={e.logoUrl} alt={e.company} className="h-11 w-11 rounded-xl bg-white object-contain p-1" />
+                      <img loading="lazy" decoding="async" src={e.logoUrl} alt={e.company} className="h-11 w-11 rounded-xl bg-[#fff] object-contain p-1" />
                     )}
                     <div className="min-w-0 flex-1">
                       <h4 className="font-display text-xl font-semibold">{e.role}</h4>

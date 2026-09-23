@@ -13,7 +13,15 @@ const GROUND = H - 34;      // posisi tanah
 const PLAYER = { x: 56, w: 26, h: 38 };
 const GRAVITY = 2300;
 const JUMP_V = 780;
-const LIME = "#c6f432";
+let LIME = "#c6f432";
+let GRID = "rgba(255,255,255,.05)";
+let DASH = "rgba(198,244,50,.35)";
+function readTheme() {
+  const light = document.documentElement.classList.contains("light");
+  LIME = light ? "#65a30d" : "#c6f432";
+  GRID = light ? "rgba(0,0,0,.06)" : "rgba(255,255,255,.05)";
+  DASH = light ? "rgba(101,163,13,.45)" : "rgba(198,244,50,.35)";
+}
 
 export function DevRunner() {
   const canvas = useRef<HTMLCanvasElement>(null);
@@ -36,10 +44,11 @@ export function DevRunner() {
     if (!c || !ctx) return;
     const st = s.current;
     const W = st.w;
+    readTheme();
     ctx.clearRect(0, 0, W, H);
 
     // grid bergerak (senada dengan hero)
-    ctx.strokeStyle = "rgba(255,255,255,.05)";
+    ctx.strokeStyle = GRID;
     ctx.lineWidth = 1;
     const cell = 28;
     const off = (st.dist * 0.5) % cell;
@@ -52,7 +61,7 @@ export function DevRunner() {
     ctx.shadowColor = LIME; ctx.shadowBlur = 12;
     ctx.fillStyle = LIME; ctx.fillRect(0, GROUND, W, 2);
     ctx.shadowBlur = 0;
-    ctx.fillStyle = "rgba(198,244,50,.35)";
+    ctx.fillStyle = DASH;
     const dOff = st.dist % 40;
     for (let x = -dOff; x < W; x += 40) ctx.fillRect(x, GROUND + 10, 14, 2);
     for (let x = -((st.dist * 1.3) % 90); x < W; x += 90) ctx.fillRect(x + 30, GROUND + 20, 6, 2);
@@ -171,7 +180,8 @@ export function DevRunner() {
     resize();
     const ro = new ResizeObserver(resize);
     ro.observe(b);
-    return () => ro.disconnect();
+    window.addEventListener("themechange", draw);
+    return () => { ro.disconnect(); window.removeEventListener("themechange", draw); };
   }, [draw]);
 
   // keyboard: Spasi / ↑ / W — hanya saat game aktif atau area game difokus
