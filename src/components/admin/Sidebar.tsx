@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Award, Briefcase, ExternalLink, FolderKanban, GraduationCap, LayoutDashboard, LogOut, Mail, Menu, Sparkles, User, X } from "lucide-react";
+import { Award, Briefcase, FileUser, ExternalLink, FolderKanban, GraduationCap, LayoutDashboard, LogOut, Mail, Menu, Sparkles, User, X } from "lucide-react";
 import clsx from "clsx";
 import { logout } from "@/app/admin/actions";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -16,6 +16,7 @@ const nav = [
   { href: "/admin/education", label: "Pendidikan", icon: GraduationCap },
   { href: "/admin/skills", label: "Skill", icon: Sparkles },
   { href: "/admin/certificates", label: "Sertifikat", icon: Award },
+  { href: "/admin/cv", label: "Buat CV", icon: FileUser },
   { href: "/admin/messages", label: "Pesan", icon: Mail },
 ];
 
