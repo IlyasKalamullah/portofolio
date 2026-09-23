@@ -6,7 +6,7 @@ import { Socials } from "./Socials";
 export function Contact({ profile }: { profile: Profile }) {
   return (
     <section id="contact" className="mx-auto max-w-6xl scroll-mt-24 px-5 py-24">
-      <div className="card reveal relative overflow-hidden p-6 sm:p-12">
+      <div className="card spotlight reveal relative overflow-hidden p-6 sm:p-12">
         <div className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-accent/20 blur-[100px]" />
         <div className="relative grid gap-12 lg:grid-cols-2">
           <div>

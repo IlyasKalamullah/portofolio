@@ -9,7 +9,7 @@ import { createSession, safeEqual, SESSION_COOKIE, sessionCookieOptions } from "
 import { getResource, parseForm, profileFields } from "@/lib/resources";
 import { slugify } from "@/lib/data";
 
-export type FormState = { error?: string; ok?: string } | undefined;
+export type FormState = { error?: string; ok?: string; redirectTo?: string; t?: number } | undefined;
 
 // ---------- Auth ----------
 export async function login(_: FormState, fd: FormData): Promise<FormState> {
@@ -23,13 +23,14 @@ export async function login(_: FormState, fd: FormData): Promise<FormState> {
   const ok = safeEqual(email, adminEmail) && safeEqual(password, adminPassword);
   if (!ok) {
     await new Promise((r) => setTimeout(r, 600));
-    return { error: "Email atau password salah." };
+    return { error: "Email atau password salah.", t: Date.now() };
   }
   const token = await createSession(email);
   (await cookies()).set(SESSION_COOKIE, token, sessionCookieOptions);
 
+  // Client menampilkan animasi sukses dulu, lalu pindah ke dashboard
   const next = String(fd.get("next") ?? "");
-  redirect(next.startsWith("/admin") ? next : "/admin");
+  return { ok: "Berhasil masuk", redirectTo: next.startsWith("/admin") ? next : "/admin" };
 }
 
 export async function logout() {

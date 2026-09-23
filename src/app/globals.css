@@ -78,8 +78,25 @@ body { @apply bg-ink text-zinc-100 antialiased; }
 
 .section-label { @apply inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.2em] text-accent; }
 
+/* ===== Login ===== */
+@property --angle { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
+.glow-border {
+  --glow: #c6f432;
+  background:
+    conic-gradient(from var(--angle), transparent 0 62%, color-mix(in srgb, var(--glow) 35%, transparent) 75%, var(--glow) 86%, transparent 94%),
+    rgba(255,255,255,.08);
+  animation: spin-angle 4s linear infinite;
+  box-shadow: 0 30px 80px -20px rgba(0,0,0,.8), 0 0 60px -30px var(--glow);
+  transition: box-shadow .4s;
+}
+.glow-border-error { --glow: #ef4444; }
+.glow-border-success { --glow: #34d399; animation-duration: 1s; }
+@keyframes spin-angle { to { --angle: 360deg; } }
+.login-card-in { animation: card-in .8s cubic-bezier(.2,.8,.2,1) backwards; } /* backwards: agar efek keluar (scale/opacity) tidak tertimpa */
+@keyframes card-in { from { opacity: 0; transform: translateY(24px) scale(.96); filter: blur(8px); } to { opacity: 1; transform: none; filter: none; } }
+
 @media (prefers-reduced-motion: reduce) {
-  .reveal, .reveal.in, .intro, .rise { opacity: 1; animation: none; }
+  .reveal, .reveal.in, .intro, .rise, .login-card-in, .glow-border { opacity: 1; animation: none; }
   .bar-fill { transform: none; transition: none; }
   .animate-marquee, .animate-float, .grid-move { animation: none; }
 }
