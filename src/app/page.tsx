@@ -11,6 +11,7 @@ import { Contact } from "@/components/site/Contact";
 import { Footer } from "@/components/site/Footer";
 import { SectionTitle } from "@/components/site/SectionTitle";
 import { RevealObserver } from "@/components/site/Reveal";
+import { GamesSection } from "@/components/site/games/GamesSection";
 import { ScrollProgress } from "@/components/site/ScrollProgress";
 import { primaryRole } from "@/lib/text";
 
@@ -49,6 +50,12 @@ export default async function Home() {
         <Journey experiences={experiences} education={education} />
         <Skills skills={skills} />
         <Certificates certificates={certificates} />
+        <section id="games" className="mx-auto max-w-6xl scroll-mt-24 px-5 py-24">
+          <SectionTitle label="Mini game" title="Istirahat sejenak 🎮" desc="Dua mini game buatan saya sendiri. Coba kalahkan skor terbaikmu!" />
+          <div className="reveal">
+            <GamesSection />
+          </div>
+        </section>
         <Contact profile={profile} />
       </main>
       <Footer name={profile.name} />

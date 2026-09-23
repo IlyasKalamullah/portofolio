@@ -10,6 +10,7 @@ const links = [
   { href: "#projects", label: "Proyek" },
   { href: "#experience", label: "Pengalaman" },
   { href: "#skills", label: "Skill" },
+  { href: "#games", label: "Game" },
   { href: "#contact", label: "Kontak" },
 ];
 
