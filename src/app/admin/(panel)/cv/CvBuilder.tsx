@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
-import { CheckCircle2, Download, ExternalLink, FileText, Globe, Info, Loader2, RotateCcw } from "lucide-react";
+import { CheckCircle2, Download, ExternalLink, FileText, Globe, Info, Languages, Loader2, RotateCcw, Save } from "lucide-react";
 
 type Section = "summary" | "experience" | "education" | "skills" | "projects" | "certificates";
 const SECTIONS: { key: Section; label: string }[] = [
@@ -17,13 +17,14 @@ const SECTIONS: { key: Section; label: string }[] = [
 const input = "w-full rounded-lg border border-white/10 bg-ink-900 px-3 py-2 text-sm outline-none transition placeholder:text-zinc-600 focus:border-accent/60 focus:ring-2 focus:ring-accent/20";
 
 export function CvBuilder({
-  defaultTitle, defaultSummary, projects, certificates, resumeUrl,
+  defaultTitle, defaultSummary, projects, certificates, resumeUrl, resumeUrlEn,
 }: {
   defaultTitle: string;
   defaultSummary: string;
   projects: { id: number; title: string; year: string | null }[];
   certificates: { id: number; title: string; issuer: string }[];
   resumeUrl: string | null;
+  resumeUrlEn: string | null;
 }) {
   const [lang, setLang] = useState<"id" | "en">("id");
   const [sections, setSections] = useState<Section[]>(SECTIONS.map((s) => s.key));
@@ -37,6 +38,8 @@ export function CvBuilder({
   const [busy, setBusy] = useState<"" | "pdf" | "docx" | "publish">("");
   const [msg, setMsg] = useState<{ ok?: string; error?: string; url?: string }>({});
   const urlRef = useRef<string | null>(null);
+  const [links, setLinks] = useState({ id: resumeUrl, en: resumeUrlEn });
+  const [rev, setRev] = useState(0); // naik setelah koreksi terjemahan disimpan → pratinjau diperbarui
 
   const options = { lang, sections: SECTIONS.map((s) => s.key).filter((k) => sections.includes(k)), title, summary, projectIds, certificateIds };
   const optKey = JSON.stringify(options);
@@ -68,7 +71,7 @@ export function CvBuilder({
     }, 600);
     return () => { cancel = true; clearTimeout(t); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [optKey]);
+  }, [optKey, rev]);
   useEffect(() => () => { if (urlRef.current) URL.revokeObjectURL(urlRef.current); }, []);
 
   const download = async (format: "pdf" | "docx") => {
@@ -90,7 +93,8 @@ export function CvBuilder({
       const res = await fetch("/api/cv/publish", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(options) });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error);
-      setMsg({ ok: "CV terpasang! Tombol \"Unduh CV\" di website sekarang memakai CV ini.", url: json.url });
+      if (lang === "en") setLinks((l) => ({ ...l, en: json.url })); else setLinks((l) => ({ ...l, id: json.url }));
+      setMsg({ ok: `CV ${lang === "en" ? "bahasa Inggris" : "bahasa Indonesia"} terpasang di tombol "Unduh CV" website.`, url: json.url });
     } catch (e) { setMsg({ error: (e as Error).message }); }
     setBusy("");
   };
@@ -101,7 +105,7 @@ export function CvBuilder({
     <div className="grid gap-6 xl:grid-cols-[400px_1fr]">
       {/* ===== Opsi ===== */}
       <div className="space-y-5">
-        <Card title="Bahasa judul bagian">
+        <Card title="Bahasa CV">
           <div className="grid grid-cols-2 gap-2">
             {(["id", "en"] as const).map((l) => (
               <button key={l} type="button" onClick={() => setLang(l)}
@@ -110,7 +114,9 @@ export function CvBuilder({
               </button>
             ))}
           </div>
-          <p className="mt-2 text-xs text-zinc-500">Isi data tetap sesuai yang Anda tulis di admin.</p>
+          <p className="mt-2 text-xs text-zinc-500">
+            {lang === "en" ? "Semua isi diterjemahkan otomatis ke bahasa Inggris. Periksa & koreksi hasilnya di panel Terjemahan." : "Isi CV sesuai data yang Anda tulis di admin."}
+          </p>
         </Card>
 
         <Card title="Posisi yang dilamar">
@@ -130,6 +136,8 @@ export function CvBuilder({
             ))}
           </div>
         </Card>
+
+        {lang === "en" && <TranslationPanel optKey={optKey} options={options} rev={rev} onSaved={() => setRev((n) => n + 1)} />}
 
         {sections.includes("projects") && projects.length > 0 && (
           <Card title={`Proyek (${projectIds.length} dipilih)`}>
@@ -158,7 +166,7 @@ export function CvBuilder({
         <div className="flex flex-wrap gap-2">
           <ActionButton primary onClick={() => download("pdf")} busy={busy === "pdf"} icon={<Download size={16} />}>Unduh PDF</ActionButton>
           <ActionButton onClick={() => download("docx")} busy={busy === "docx"} icon={<FileText size={16} />}>Unduh Word</ActionButton>
-          <ActionButton onClick={publish} busy={busy === "publish"} icon={<Globe size={16} />}>Pasang di website</ActionButton>
+          <ActionButton onClick={publish} busy={busy === "publish"} icon={<Globe size={16} />}>Pasang di website ({lang === "en" ? "EN" : "ID"})</ActionButton>
         </div>
 
         {msg.error && <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-400">{msg.error}</p>}
@@ -190,7 +198,13 @@ export function CvBuilder({
             <li>Teks asli (bisa di-copy), font standar, dan judul bagian yang dikenali ATS.</li>
             <li>Tips: isi deskripsi pengalaman dengan poin berisi angka/hasil, mis. &quot;Meningkatkan kecepatan halaman 40%&quot;.</li>
           </ul>
-          {resumeUrl && <p className="mt-3 text-xs">CV di website saat ini: <a href={resumeUrl} target="_blank" rel="noreferrer" className="text-accent underline">buka</a></p>}
+          <p className="mt-3 text-xs">
+            CV di website saat ini:{" "}
+            {links.id ? <a href={links.id} target="_blank" rel="noreferrer" className="text-accent underline">🇮🇩 Indonesia</a> : <span>🇮🇩 belum ada</span>}
+            {" · "}
+            {links.en ? <a href={links.en} target="_blank" rel="noreferrer" className="text-accent underline">🇬🇧 English</a> : <span>🇬🇧 belum ada</span>}
+          </p>
+          <p className="mt-1 text-xs">Pilih bahasa di atas lalu klik &quot;Pasang di website&quot; untuk masing-masing versi.</p>
         </div>
       </div>
     </div>
@@ -234,5 +248,101 @@ function ActionButton({ children, onClick, busy, icon, primary }: { children: Re
         primary ? "bg-accent text-black hover:bg-accent-soft" : "border border-white/10 hover:border-accent/50")}>
       {busy ? <Loader2 size={16} className="animate-spin" /> : icon} {children}
     </button>
+  );
+}
+
+type Tr = { source: string; text: string; auto: boolean; failed?: boolean };
+
+/** Daftar teks yang diterjemahkan otomatis + kolom untuk mengoreksi. */
+function TranslationPanel({ optKey, options, rev, onSaved }: { optKey: string; options: object; rev: number; onSaved: () => void }) {
+  const [items, setItems] = useState<Tr[]>([]);
+  const [engine, setEngine] = useState("");
+  const [errors, setErrors] = useState<string[]>([]);
+  const [edits, setEdits] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    let cancel = false;
+    setLoading(true);
+    const t = setTimeout(async () => {
+      try {
+        const res = await fetch("/api/cv/translations", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(options) });
+        const json = await res.json();
+        if (!cancel && res.ok) { setItems([...json.translations].sort((a: Tr, b: Tr) => Number(!!b.failed) - Number(!!a.failed))); setEngine(json.engine); setErrors(json.errors ?? []); setEdits({}); }
+      } finally {
+        if (!cancel) setLoading(false);
+      }
+    }, 700);
+    return () => { cancel = true; clearTimeout(t); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [optKey, rev]);
+
+  const changed = Object.entries(edits).filter(([src, txt]) => txt.trim() && txt !== items.find((i) => i.source === src)?.text);
+  const failed = items.filter((i) => i.failed).length;
+
+  const save = async () => {
+    setSaving(true);
+    await fetch("/api/cv/translations", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ items: changed.map(([source, text]) => ({ source, text })) }) });
+    setSaving(false);
+    onSaved();
+  };
+  const reset = async (source: string) => {
+    await fetch("/api/cv/translations", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ source }) });
+    onSaved();
+  };
+
+  return (
+    <Card
+      title={`Terjemahan${items.length ? ` (${items.length} teks)` : ""}`}
+      action={loading ? <Loader2 size={14} className="animate-spin text-zinc-500" /> : <Languages size={14} className="text-zinc-500" />}
+    >
+      <p className="mb-3 text-xs text-zinc-500">
+        Mesin: {engine === "gemini" ? "Gemini AI (cadangan: Google Translate)" : "Google Translate"}. Nama perusahaan, sekolah, proyek, sertifikat & teknologi tidak diterjemahkan.
+        Hasil disimpan, jadi cukup dikoreksi sekali.
+      </p>
+      {failed > 0 && (
+        <p className="mb-3 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-400">
+          {failed} teks gagal diterjemahkan otomatis. Isi terjemahannya manual di bawah, atau buka ulang halaman ini untuk mencoba lagi.
+          {errors.length > 0 && (
+            <span className="mt-1.5 block break-words font-mono text-[11px] opacity-80">Penyebab: {errors.join(" · ")}</span>
+          )}
+        </p>
+      )}
+      <div className="max-h-[420px] space-y-3 overflow-y-auto pr-1">
+        {items.map((it) => {
+          const value = edits[it.source] ?? it.text;
+          return (
+            <div key={it.source} className="rounded-lg border border-white/5 bg-ink-900/60 p-2.5">
+              <div className="mb-1.5 flex items-start justify-between gap-2">
+                <p className="line-clamp-2 text-xs text-zinc-500">{it.source}</p>
+                <span className={clsx("shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium",
+                  it.failed ? "bg-red-500/15 text-red-400" : it.auto ? "bg-white/5 text-zinc-400" : "bg-accent/15 text-accent")}>
+                  {it.failed ? "Gagal" : it.auto ? "Otomatis" : "Dikoreksi"}
+                </span>
+              </div>
+              <textarea
+                value={value}
+                onChange={(e) => setEdits({ ...edits, [it.source]: e.target.value })}
+                rows={Math.min(5, Math.max(1, Math.ceil(value.length / 48)))}
+                className="w-full resize-y rounded-md border border-white/10 bg-ink-800 px-2.5 py-1.5 text-sm outline-none focus:border-accent/60"
+              />
+              {!it.auto && (
+                <button type="button" onClick={() => reset(it.source)} className="mt-1 inline-flex items-center gap-1 text-[11px] text-zinc-500 hover:text-white">
+                  <RotateCcw size={11} /> Terjemahkan ulang otomatis
+                </button>
+              )}
+            </div>
+          );
+        })}
+        {!loading && items.length === 0 && <p className="text-sm text-zinc-500">Tidak ada teks yang perlu diterjemahkan.</p>}
+      </div>
+      {changed.length > 0 && (
+        <button type="button" onClick={save} disabled={saving}
+          className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-black hover:bg-accent-soft disabled:opacity-60">
+          {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />} Simpan {changed.length} koreksi
+        </button>
+      )}
+    </Card>
   );
 }

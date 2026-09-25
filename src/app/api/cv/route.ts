@@ -17,7 +17,7 @@ export async function POST(req: Request) {
     return new NextResponse(new Uint8Array(buf), {
       headers: {
         "Content-Type": format === "docx" ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document" : "application/pdf",
-        "Content-Disposition": `inline; filename="${cvFileName(data.name, format)}"`,
+        "Content-Disposition": `inline; filename="${cvFileName(data.lang === "en" ? `${data.name} EN` : data.name, format)}"`,
         "Cache-Control": "no-store",
       },
     });

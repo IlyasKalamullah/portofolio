@@ -18,6 +18,7 @@ model Profile {
   bio             String   @default("")
   avatarUrl       String?
   resumeUrl       String?
+  resumeUrlEn     String?
   email           String?
   phone           String?
   location        String?
@@ -107,4 +108,15 @@ model Message {
   message   String
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
+}
+
+/// Cache & koreksi terjemahan (dipakai CV bahasa Inggris)
+model Translation {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique // hash dari teks asli + bahasa tujuan
+  source    String
+  lang      String   @default("en")
+  text      String
+  auto      Boolean  @default(true) // false = sudah dikoreksi manual di admin
+  updatedAt DateTime @updatedAt
 }

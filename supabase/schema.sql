@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS "Profile" (
   "bio" TEXT NOT NULL DEFAULT '',
   "avatarUrl" TEXT,
   "resumeUrl" TEXT,
+  "resumeUrlEn" TEXT,
   "email" TEXT,
   "phone" TEXT,
   "location" TEXT,
@@ -109,6 +110,18 @@ CREATE TABLE IF NOT EXISTS "Message" (
   CONSTRAINT "Message_pkey" PRIMARY KEY ("id")
 );
 
+CREATE TABLE IF NOT EXISTS "Translation" (
+  "id" SERIAL NOT NULL,
+  "key" TEXT NOT NULL,
+  "source" TEXT NOT NULL,
+  "lang" TEXT NOT NULL DEFAULT 'en',
+  "text" TEXT NOT NULL,
+  "auto" BOOLEAN NOT NULL DEFAULT true,
+  "updatedAt" TIMESTAMP(3) NOT NULL,
+  CONSTRAINT "Translation_pkey" PRIMARY KEY ("id")
+);
+CREATE UNIQUE INDEX IF NOT EXISTS "Translation_key_key" ON "Translation"("key");
+
 -- Keamanan: aktifkan RLS agar tabel TIDAK bisa diakses lewat Supabase public API (anon key).
 -- Aplikasi tetap bisa akses karena terhubung langsung sebagai user postgres.
 ALTER TABLE "Profile" ENABLE ROW LEVEL SECURITY;
@@ -118,3 +131,7 @@ ALTER TABLE "Education" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "Skill" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "Certificate" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "Message" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "Translation" ENABLE ROW LEVEL SECURITY;
+
+-- Untuk database lama (sudah dibuat sebelum fitur CV bahasa Inggris):
+ALTER TABLE "Profile" ADD COLUMN IF NOT EXISTS "resumeUrlEn" TEXT;

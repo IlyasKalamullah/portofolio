@@ -21,6 +21,7 @@ export default async function CvPage() {
         projects={projects}
         certificates={certificates}
         resumeUrl={profile.resumeUrl}
+        resumeUrlEn={profile.resumeUrlEn}
       />
     </>
   );

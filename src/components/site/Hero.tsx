@@ -1,6 +1,7 @@
-import { ArrowDown, ArrowUpRight, Download, MapPin } from "lucide-react";
+import { ArrowDown, ArrowUpRight, MapPin } from "lucide-react";
 import type { Profile } from "@prisma/client";
 import { Socials } from "./Socials";
+import { CvButton } from "./CvButton";
 import { HeroGrid } from "./HeroGrid";
 import { Typewriter } from "./Typewriter";
 import { CountUp } from "./CountUp";
@@ -61,17 +62,15 @@ export function Hero({ profile }: { profile: Profile }) {
             </p>
             {profile.tagline && <p className="intro mt-4 max-w-xl text-base leading-relaxed text-zinc-400 sm:text-lg" style={seq(1)}>{profile.tagline}</p>}
 
-            <div className="intro mt-8 flex flex-wrap items-center gap-3" style={seq(2)}>
+            <div className="intro relative z-20 mt-8 flex flex-wrap items-center gap-3" style={seq(2)}>
               <Magnetic>
                 <a href="#projects" className="group inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-black shadow-[0_0_0_0_rgba(198,244,50,.5)] transition hover:bg-accent-soft hover:shadow-[0_0_30px_-4px_rgba(198,244,50,.6)]">
                   Lihat karya saya <ArrowUpRight size={18} className="transition group-hover:rotate-45" />
                 </a>
               </Magnetic>
-              {profile.resumeUrl && (
+              {(profile.resumeUrl || profile.resumeUrlEn) && (
                 <Magnetic>
-                  <a href={profile.resumeUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full border border-white/15 px-6 py-3 text-sm font-semibold transition hover:border-white/40 hover:bg-white/5">
-                    <Download size={16} /> Unduh CV
-                  </a>
+                  <CvButton id={profile.resumeUrl} en={profile.resumeUrlEn} />
                 </Magnetic>
               )}
             </div>
