@@ -19,6 +19,7 @@ export type ProjectCard = {
   repoUrl: string | null;
   year: string | null;
   featured: boolean;
+  role?: string | null;
 };
 
 export function ProjectsGrid({ projects }: { projects: ProjectCard[] }) {
@@ -67,6 +68,7 @@ export function ProjectsGrid({ projects }: { projects: ProjectCard[] }) {
                 <h3 className="font-display text-xl font-semibold sm:text-2xl">{p.title}</h3>
                 <ArrowUpRight className="mt-1 shrink-0 text-zinc-500 transition group-hover/t:rotate-45 group-hover/t:text-accent" />
               </Link>
+              {p.role && <p className="mt-1.5 text-xs font-medium text-accent">Peran: {p.role}</p>}
               {p.summary && <p className="mt-3 line-clamp-3 flex-1 text-sm leading-relaxed text-zinc-400">{p.summary}</p>}
               {p.tags.length > 0 && (
                 <div className="mt-5 flex flex-wrap gap-1.5">

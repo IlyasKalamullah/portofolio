@@ -40,6 +40,8 @@ model Project {
   slug      String   @unique
   summary   String   @default("")
   content   String   @default("")
+  role      String?
+  responsibilities String @default("")
   imageUrl  String?
   category  String?
   tags      String[] @default([])
@@ -91,7 +93,10 @@ model Skill {
 
 model Certificate {
   id         Int      @id @default(autoincrement())
+  type       String   @default("Sertifikasi") // "Sertifikasi" | "Organisasi & Kegiatan"
   title      String
+  role       String?
+  description String  @default("")
   issuer     String
   date       String?
   credentialUrl String?

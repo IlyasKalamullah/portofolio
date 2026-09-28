@@ -10,6 +10,7 @@ import { PageHeader } from "@/components/admin/PageHeader";
 const defaults: Record<string, Record<string, unknown>> = {
   project: { published: true, order: 0 },
   skill: { level: 80, order: 0 },
+  certificate: { type: "Sertifikasi", order: 0 },
 };
 
 export default async function ResourceEdit({ params }: { params: Promise<{ resource: string; id: string }> }) {

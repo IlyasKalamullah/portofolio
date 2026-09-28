@@ -3,10 +3,11 @@ import { prisma } from "@/lib/prisma";
 import { getProfile } from "@/lib/data";
 import { primaryRole } from "@/lib/text";
 import { translateMany, type TranslationRow } from "@/lib/translate";
+import { isActivity } from "@/lib/certificates";
 
 export type CvLang = "id" | "en";
-export type CvSection = "summary" | "experience" | "education" | "skills" | "projects" | "certificates";
-export const ALL_SECTIONS: CvSection[] = ["summary", "experience", "education", "skills", "projects", "certificates"];
+export type CvSection = "summary" | "experience" | "education" | "skills" | "projects" | "activities" | "certificates";
+export const ALL_SECTIONS: CvSection[] = ["summary", "experience", "education", "skills", "projects", "activities", "certificates"];
 
 export type CvOptions = {
   lang: CvLang;
@@ -18,9 +19,9 @@ export type CvOptions = {
   portfolioUrl?: string;
 };
 
-export const LABELS: Record<CvLang, Record<CvSection | "present" | "tech" | "link", string>> = {
-  id: { summary: "Ringkasan Profesional", experience: "Pengalaman Kerja", education: "Pendidikan", skills: "Keahlian", projects: "Proyek", certificates: "Sertifikasi", present: "Sekarang", tech: "Teknologi", link: "Tautan" },
-  en: { summary: "Professional Summary", experience: "Work Experience", education: "Education", skills: "Skills", projects: "Projects", certificates: "Certifications", present: "Present", tech: "Tech", link: "Link" },
+export const LABELS: Record<CvLang, Record<CvSection | "present" | "tech" | "link" | "role", string>> = {
+  id: { summary: "Ringkasan Profesional", experience: "Pengalaman Kerja", education: "Pendidikan", skills: "Keahlian", projects: "Proyek", activities: "Organisasi & Kegiatan", certificates: "Sertifikasi", present: "Sekarang", tech: "Teknologi", link: "Tautan", role: "Peran" },
+  en: { summary: "Professional Summary", experience: "Work Experience", education: "Education", skills: "Skills", projects: "Projects", activities: "Organizational Experience & Activities", certificates: "Certifications", present: "Present", tech: "Tech", link: "Link", role: "Role" },
 };
 
 export type CvItem = { heading: string; sub?: string; meta?: string; bullets: string[] };
@@ -142,14 +143,35 @@ export async function buildCvWithTranslations(opts: CvOptions) {
             key, label: L.projects,
             items: list.map((x) => ({
               heading: clean(x.title),
-              sub: [clean(x.category) && t(clean(x.category)), x.tags.length ? `${L.tech}: ${x.tags.map(clean).join(", ")}` : ""].filter(Boolean).join(" | "),
+              sub: [
+                clean(x.role) && t(clean(x.role)),
+                clean(x.category) && t(clean(x.category)),
+                x.tags.length ? `${L.tech}: ${x.tags.map(clean).join(", ")}` : "",
+              ].filter(Boolean).join(" | "),
               meta: clean(x.year),
-              bullets: [clean(x.summary) && t(clean(x.summary)), x.liveUrl || x.repoUrl ? `${L.link}: ${stripUrl(x.liveUrl || x.repoUrl)}` : ""].filter(Boolean),
+              bullets: [
+                clean(x.summary) && t(clean(x.summary)),
+                ...bullets(x.responsibilities).map(t),
+                x.liveUrl || x.repoUrl ? `${L.link}: ${stripUrl(x.liveUrl || x.repoUrl)}` : "",
+              ].filter(Boolean),
+            })),
+          });
+      }
+      if (key === "activities") {
+        const list = (opts.certificateIds ? certificates.filter((c) => opts.certificateIds!.includes(c.id)) : certificates).filter((c) => isActivity(c.type));
+        if (list.length)
+          sections.push({
+            key, label: L.activities,
+            items: list.map((c) => ({
+              heading: clean(c.title),
+              sub: [clean(c.role) && t(clean(c.role)), clean(c.issuer)].filter(Boolean).join(" | "),
+              meta: date(c.date),
+              bullets: bullets(c.description).map(t),
             })),
           });
       }
       if (key === "certificates") {
-        const list = opts.certificateIds ? certificates.filter((c) => opts.certificateIds!.includes(c.id)) : certificates;
+        const list = (opts.certificateIds ? certificates.filter((c) => opts.certificateIds!.includes(c.id)) : certificates).filter((c) => !isActivity(c.type));
         if (list.length)
           sections.push({ key, label: L.certificates, lines: list.map((c) => [clean(c.title), clean(c.issuer), date(c.date)].filter(Boolean).join(" – ")) });
       }

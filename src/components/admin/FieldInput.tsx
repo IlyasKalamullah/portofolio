@@ -31,7 +31,7 @@ export function FieldInput({ field, value }: { field: Field; value: unknown }) {
         <ImageField id={id} name={field.name} initial={(value as string) ?? ""} />
       ) : field.type === "select" ? (
         <select id={id} name={field.name} defaultValue={(value as string) ?? ""} className={inputCls}>
-          <option value="">—</option>
+          {!field.required && <option value="">—</option>}
           {field.options?.map((o) => (
             <option key={o} value={o}>{o}</option>
           ))}

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowUpRight } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, ListChecks, UserRound } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getProfile } from "@/lib/data";
 import { GithubIcon } from "@/components/site/Icons";
@@ -29,6 +29,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   const { slug } = await params;
   const [project, profile] = await Promise.all([getProject(slug), getProfile()]);
   if (!project) notFound();
+  const responsibilities = project.responsibilities.split("\n").map((l) => l.replace(/^[-•*]\s*/, "").trim()).filter(Boolean);
 
   const others = await prisma.project.findMany({
     where: { published: true, NOT: { id: project.id } },
@@ -72,19 +73,52 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         )}
 
         <div className="mt-12 grid gap-10 md:grid-cols-[1fr_220px]">
-          <article className="space-y-5 leading-relaxed text-zinc-300">
-            {(project.content || project.summary).split(/\n\s*\n/).map((para, i) => (
-              <p key={i} className="whitespace-pre-line">{para}</p>
-            ))}
-          </article>
-          {project.tags.length > 0 && (
-            <aside>
-              <p className="mb-3 text-xs uppercase tracking-widest text-zinc-500">Teknologi</p>
-              <div className="flex flex-wrap gap-2">
-                {project.tags.map((t) => <span key={t} className="rounded-full border border-white/10 px-3 py-1 font-mono text-xs">{t}</span>)}
+          <div className="space-y-10">
+            <article className="space-y-5 leading-relaxed text-zinc-300">
+              {(project.content || project.summary).split(/\n\s*\n/).map((para, i) => (
+                <p key={i} className="whitespace-pre-line">{para}</p>
+              ))}
+            </article>
+            {responsibilities.length > 0 && (
+              <section className="card p-6 sm:p-7">
+                <h2 className="flex items-center gap-2 font-display text-xl font-semibold">
+                  <ListChecks size={20} className="text-accent" /> Yang saya kerjakan
+                </h2>
+                <ol className="mt-5 space-y-3">
+                  {responsibilities.map((r, i) => (
+                    <li key={i} className="flex gap-3 text-zinc-300">
+                      <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-accent/15 font-mono text-xs font-semibold text-accent">{i + 1}</span>
+                      <span className="leading-relaxed">{r}</span>
+                    </li>
+                  ))}
+                </ol>
+              </section>
+            )}
+          </div>
+          <aside className="space-y-8">
+            {project.role && (
+              <div>
+                <p className="mb-2 text-xs uppercase tracking-widest text-zinc-500">Peran saya</p>
+                <p className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-sm font-medium text-accent">
+                  <UserRound size={14} /> {project.role}
+                </p>
               </div>
-            </aside>
-          )}
+            )}
+            {project.year && (
+              <div>
+                <p className="mb-2 text-xs uppercase tracking-widest text-zinc-500">Tahun</p>
+                <p className="text-sm">{project.year}</p>
+              </div>
+            )}
+            {project.tags.length > 0 && (
+              <div>
+                <p className="mb-3 text-xs uppercase tracking-widest text-zinc-500">Teknologi</p>
+                <div className="flex flex-wrap gap-2">
+                  {project.tags.map((t) => <span key={t} className="rounded-full border border-white/10 px-3 py-1 font-mono text-xs">{t}</span>)}
+                </div>
+              </div>
+            )}
+          </aside>
         </div>
 
         {others.length > 0 && (

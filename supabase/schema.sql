@@ -33,6 +33,8 @@ CREATE TABLE IF NOT EXISTS "Project" (
   "slug" TEXT NOT NULL,
   "summary" TEXT NOT NULL DEFAULT '',
   "content" TEXT NOT NULL DEFAULT '',
+  "role" TEXT,
+  "responsibilities" TEXT NOT NULL DEFAULT '',
   "imageUrl" TEXT,
   "category" TEXT,
   "tags" TEXT[] DEFAULT ARRAY[]::TEXT[],
@@ -89,7 +91,10 @@ CREATE TABLE IF NOT EXISTS "Skill" (
 
 CREATE TABLE IF NOT EXISTS "Certificate" (
   "id" SERIAL NOT NULL,
+  "type" TEXT NOT NULL DEFAULT 'Sertifikasi',
   "title" TEXT NOT NULL,
+  "role" TEXT,
+  "description" TEXT NOT NULL DEFAULT '',
   "issuer" TEXT NOT NULL,
   "date" TEXT,
   "credentialUrl" TEXT,
@@ -135,3 +140,8 @@ ALTER TABLE "Translation" ENABLE ROW LEVEL SECURITY;
 
 -- Untuk database lama (sudah dibuat sebelum fitur CV bahasa Inggris):
 ALTER TABLE "Profile" ADD COLUMN IF NOT EXISTS "resumeUrlEn" TEXT;
+ALTER TABLE "Project" ADD COLUMN IF NOT EXISTS "role" TEXT;
+ALTER TABLE "Project" ADD COLUMN IF NOT EXISTS "responsibilities" TEXT NOT NULL DEFAULT '';
+ALTER TABLE "Certificate" ADD COLUMN IF NOT EXISTS "type" TEXT NOT NULL DEFAULT 'Sertifikasi';
+ALTER TABLE "Certificate" ADD COLUMN IF NOT EXISTS "role" TEXT;
+ALTER TABLE "Certificate" ADD COLUMN IF NOT EXISTS "description" TEXT NOT NULL DEFAULT '';

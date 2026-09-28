@@ -43,7 +43,7 @@ export default async function Home() {
           <ProjectsGrid
             projects={projects.map((p) => ({
               id: p.id, slug: p.slug, title: p.title, summary: p.summary, imageUrl: p.imageUrl, category: p.category,
-              tags: p.tags, liveUrl: p.liveUrl, repoUrl: p.repoUrl, year: p.year, featured: p.featured,
+              tags: p.tags, liveUrl: p.liveUrl, repoUrl: p.repoUrl, year: p.year, featured: p.featured, role: p.role,
             }))}
           />
         </section>

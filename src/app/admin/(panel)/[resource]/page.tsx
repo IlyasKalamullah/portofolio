@@ -50,6 +50,9 @@ export default async function ResourceList({ params, searchParams }: { params: P
                   {item[res.titleField]}
                   {item.featured && <Star size={14} className="fill-accent text-accent" />}
                   {item.published === false && <EyeOff size={14} className="text-zinc-500" />}
+                  {res.badgeField && item[res.badgeField] && (
+                    <span className="rounded-full border border-white/10 px-2 py-0.5 text-[10px] font-normal text-zinc-400">{item[res.badgeField]}</span>
+                  )}
                 </p>
                 {res.subtitleField && <p className="truncate text-sm text-zinc-500">{item[res.subtitleField]}</p>}
               </div>

@@ -4,13 +4,14 @@ import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import { CheckCircle2, Download, ExternalLink, FileText, Globe, Info, Languages, Loader2, RotateCcw, Save } from "lucide-react";
 
-type Section = "summary" | "experience" | "education" | "skills" | "projects" | "certificates";
+type Section = "summary" | "experience" | "education" | "skills" | "projects" | "activities" | "certificates";
 const SECTIONS: { key: Section; label: string }[] = [
   { key: "summary", label: "Ringkasan" },
   { key: "experience", label: "Pengalaman" },
   { key: "education", label: "Pendidikan" },
   { key: "skills", label: "Skill" },
   { key: "projects", label: "Proyek" },
+  { key: "activities", label: "Organisasi & Kegiatan" },
   { key: "certificates", label: "Sertifikat" },
 ];
 
@@ -22,7 +23,7 @@ export function CvBuilder({
   defaultTitle: string;
   defaultSummary: string;
   projects: { id: number; title: string; year: string | null }[];
-  certificates: { id: number; title: string; issuer: string }[];
+  certificates: { id: number; title: string; issuer: string; type: string }[];
   resumeUrl: string | null;
   resumeUrlEn: string | null;
 }) {
@@ -150,11 +151,11 @@ export function CvBuilder({
           </Card>
         )}
 
-        {sections.includes("certificates") && certificates.length > 0 && (
-          <Card title={`Sertifikat (${certificateIds.length} dipilih)`}>
+        {(sections.includes("certificates") || sections.includes("activities")) && certificates.length > 0 && (
+          <Card title={`Sertifikat & kegiatan (${certificateIds.length} dipilih)`}>
             <div className="max-h-48 space-y-1.5 overflow-y-auto pr-1">
               {certificates.map((c) => (
-                <Check key={c.id} checked={certificateIds.includes(c.id)} onChange={() => setCertificateIds(toggle(certificateIds, c.id))} label={c.title} hint={c.issuer} />
+                <Check key={c.id} checked={certificateIds.includes(c.id)} onChange={() => setCertificateIds(toggle(certificateIds, c.id))} label={c.title} hint={c.type === "Organisasi & Kegiatan" ? "Kegiatan" : "Sertifikasi"} />
               ))}
             </div>
           </Card>

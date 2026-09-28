@@ -10,7 +10,7 @@ export default async function CvPage() {
   const [profile, projects, certificates] = await Promise.all([
     getProfile(),
     prisma.project.findMany({ where: { published: true }, orderBy: [{ featured: "desc" }, { order: "asc" }, { createdAt: "desc" }], select: { id: true, title: true, year: true } }),
-    prisma.certificate.findMany({ orderBy: [{ order: "asc" }, { createdAt: "desc" }], select: { id: true, title: true, issuer: true } }),
+    prisma.certificate.findMany({ orderBy: [{ order: "asc" }, { createdAt: "desc" }], select: { id: true, title: true, issuer: true, type: true } }),
   ]);
   return (
     <>

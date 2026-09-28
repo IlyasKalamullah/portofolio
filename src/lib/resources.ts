@@ -22,6 +22,7 @@ export type Resource = {
   titleField: string;
   subtitleField?: string;
   imageField?: string;
+  badgeField?: string;
   fields: Field[];
 };
 
@@ -40,6 +41,8 @@ export const resources: Resource[] = [
       { name: "category", label: "Kategori", type: "text", half: true, placeholder: "Web App, Mobile, UI/UX..." },
       { name: "year", label: "Tahun", type: "text", half: true, placeholder: "2025" },
       { name: "summary", label: "Ringkasan singkat", type: "textarea", placeholder: "1–2 kalimat untuk kartu proyek" },
+      { name: "role", label: "Peran saya di proyek ini", type: "text", placeholder: "mis. Frontend Developer, UI Designer, Solo Developer" },
+      { name: "responsibilities", label: "Apa yang saya kerjakan", type: "textarea", placeholder: "Merancang skema database dengan Prisma\nMembuat dashboard analitik dengan Recharts\nMengurangi waktu muat halaman 40%", help: "Satu poin per baris. Tampil di halaman detail proyek & di CV. Mulai dengan kata kerja + hasil yang terukur." },
       { name: "content", label: "Deskripsi lengkap", type: "textarea", help: "Ditampilkan di halaman detail proyek. Pisahkan paragraf dengan baris kosong." },
       { name: "imageUrl", label: "Gambar / thumbnail", type: "image" },
       { name: "tags", label: "Teknologi (tags)", type: "tags", placeholder: "Next.js, Tailwind, Supabase", help: "Pisahkan dengan koma" },
@@ -112,10 +115,14 @@ export const resources: Resource[] = [
     titleField: "title",
     subtitleField: "issuer",
     imageField: "imageUrl",
+    badgeField: "type",
     fields: [
-      { name: "title", label: "Nama sertifikat", type: "text", required: true },
-      { name: "issuer", label: "Penerbit", type: "text", required: true, half: true, placeholder: "Dicoding, Google, ..." },
-      { name: "date", label: "Tanggal", type: "text", half: true, placeholder: "Mar 2025" },
+      { name: "type", label: "Jenis", type: "select", required: true, options: ["Sertifikasi", "Organisasi & Kegiatan"], help: "Sertifikasi = kursus/ujian keahlian. Organisasi & Kegiatan = kepanitiaan, organisasi, seminar, lomba, volunteer." },
+      { name: "title", label: "Nama sertifikat / kegiatan", type: "text", required: true },
+      { name: "issuer", label: "Penerbit / penyelenggara", type: "text", required: true, half: true, placeholder: "Dicoding, HMIF Itenas, ..." },
+      { name: "date", label: "Tanggal / periode", type: "text", half: true, placeholder: "Mar 2025" },
+      { name: "role", label: "Peran (untuk organisasi & kegiatan)", type: "text", placeholder: "mis. Ketua Divisi Acara, Panitia, Peserta, Juara 2" },
+      { name: "description", label: "Yang saya lakukan (opsional)", type: "textarea", placeholder: "Mengkoordinasi 12 anggota divisi acara\nMenyusun rundown seminar untuk 300 peserta", help: "Satu poin per baris. Tampil di website & di CV bagian Organisasi & Kegiatan." },
       { name: "credentialUrl", label: "Link kredensial", type: "url" },
       { name: "imageUrl", label: "File sertifikat (gambar atau PDF)", type: "image", help: "JPG/PNG/WebP/PDF, maks. 4 MB" },
       { name: "order", label: "Urutan", type: "number" },
