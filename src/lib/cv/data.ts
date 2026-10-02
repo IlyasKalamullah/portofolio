@@ -24,7 +24,8 @@ export const LABELS: Record<CvLang, Record<CvSection | "present" | "tech" | "lin
   en: { summary: "Professional Summary", experience: "Work Experience", education: "Education", skills: "Skills", projects: "Projects", activities: "Organizational Experience & Activities", certificates: "Certifications", present: "Present", tech: "Tech", link: "Link", role: "Role" },
 };
 
-export type CvItem = { heading: string; sub?: string; meta?: string; bullets: string[] };
+/** desc = kalimat deskripsi (bukan bullet), bullets = poin pekerjaan, note = baris tambahan mis. tautan */
+export type CvItem = { heading: string; sub?: string; meta?: string; desc?: string; bullets: string[]; note?: string };
 export type CvData = {
   name: string;
   title: string;
@@ -149,11 +150,10 @@ export async function buildCvWithTranslations(opts: CvOptions) {
                 x.tags.length ? `${L.tech}: ${x.tags.map(clean).join(", ")}` : "",
               ].filter(Boolean).join(" | "),
               meta: clean(x.year),
-              bullets: [
-                clean(x.summary) && t(clean(x.summary)),
-                ...bullets(x.responsibilities).map(t),
-                x.liveUrl || x.repoUrl ? `${L.link}: ${stripUrl(x.liveUrl || x.repoUrl)}` : "",
-              ].filter(Boolean),
+              // ringkasan = deskripsi proyek; bullet hanya berisi pekerjaan yang dilakukan
+              desc: clean(x.summary) ? t(clean(x.summary)) : undefined,
+              bullets: bullets(x.responsibilities).map(t),
+              note: x.liveUrl || x.repoUrl ? `${L.link}: ${stripUrl(x.liveUrl || x.repoUrl)}` : undefined,
             })),
           });
       }
