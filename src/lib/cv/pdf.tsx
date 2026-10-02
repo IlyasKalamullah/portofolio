@@ -19,6 +19,8 @@ const s = StyleSheet.create({
   heading: { fontFamily: "Helvetica-Bold", fontSize: 10.5, flex: 1, paddingRight: 8 },
   meta: { fontSize: 9.5, color: "#333" },
   sub: { fontSize: 9.5, color: "#333", marginTop: 1 },
+  desc: { marginTop: 2 },
+  note: { fontSize: 9, color: "#444", marginTop: 2 },
   bullet: { flexDirection: "row", marginTop: 2 },
   dot: { width: 10 },
   bulletText: { flex: 1 },
@@ -45,18 +47,20 @@ export function CvDocument({ data }: { data: CvData }) {
             {sec.text && <Text>{sec.text}</Text>}
             {sec.lines?.map((l, i) => <Text key={i} style={s.line}>{l}</Text>)}
             {sec.items?.map((it, i) => (
-              <View key={i} style={s.item} wrap={it.bullets.length > 4}>
+              <View key={i} style={s.item} wrap={it.bullets.length + (it.desc ? 2 : 0) > 4}>
                 <View style={s.row}>
                   <Text style={s.heading}>{it.heading}</Text>
                   {it.meta ? <Text style={s.meta}>{it.meta}</Text> : null}
                 </View>
                 {it.sub ? <Text style={s.sub}>{it.sub}</Text> : null}
+                {it.desc ? <Text style={s.desc}>{it.desc}</Text> : null}
                 {it.bullets.map((b, j) => (
                   <View key={j} style={s.bullet}>
                     <Text style={s.dot}>•</Text>
                     <Text style={s.bulletText}>{b}</Text>
                   </View>
                 ))}
+                {it.note ? <Text style={s.note}>{it.note}</Text> : null}
               </View>
             ))}
           </View>

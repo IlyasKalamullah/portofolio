@@ -36,9 +36,13 @@ export async function renderCvDocx(data: CvData) {
           ],
         }),
       );
-      if (it.sub) children.push(new Paragraph({ keepNext: it.bullets.length > 0, children: [new TextRun({ text: it.sub, size: 19, font: FONT })] }));
+      const more = !!it.desc || it.bullets.length > 0 || !!it.note;
+      if (it.sub) children.push(new Paragraph({ keepNext: more, children: [new TextRun({ text: it.sub, size: 19, font: FONT })] }));
+      if (it.desc)
+        children.push(new Paragraph({ keepNext: it.bullets.length > 0, spacing: { before: 40 }, children: [new TextRun({ text: it.desc, size: 20, font: FONT })] }));
       for (const b of it.bullets)
         children.push(new Paragraph({ bullet: { level: 0 }, spacing: { before: 20 }, children: [new TextRun({ text: b, size: 20, font: FONT })] }));
+      if (it.note) children.push(new Paragraph({ spacing: { before: 40 }, children: [new TextRun({ text: it.note, size: 18, font: FONT, color: "444444" })] }));
     }
   }
 
