@@ -125,3 +125,10 @@ model Translation {
   auto      Boolean  @default(true) // false = sudah dikoreksi manual di admin
   updatedAt DateTime @updatedAt
 }
+
+/// CV hasil edit manual di kanvas admin (satu per bahasa)
+model CvDraft {
+  lang      String   @id // "id" | "en"
+  data      Json
+  updatedAt DateTime @updatedAt
+}

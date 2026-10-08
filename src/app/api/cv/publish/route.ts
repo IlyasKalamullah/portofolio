@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
-import { buildCv, cvFileName, parseOptions, siteOrigin } from "@/lib/cv/data";
+import { cvFileName } from "@/lib/cv/data";
+import { resolveCv } from "@/lib/cv/resolve";
 import { renderCvPdf } from "@/lib/cv/pdf";
 import { BUCKET, storageConfigured, supabaseAdmin } from "@/lib/supabase";
 
@@ -13,8 +14,7 @@ export async function POST(req: Request) {
   if (!(await getSession())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   if (!storageConfigured()) return NextResponse.json({ error: "Supabase Storage belum dikonfigurasi." }, { status: 400 });
   try {
-    const opts = parseOptions(await req.json().catch(() => ({})), siteOrigin(req));
-    const data = await buildCv(opts);
+    const { opts, data } = await resolveCv(await req.json().catch(() => ({})), req);
     const pdf = await renderCvPdf(data);
     const supabase = supabaseAdmin();
     const { data: bucket } = await supabase.storage.getBucket(BUCKET);

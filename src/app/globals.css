@@ -133,3 +133,14 @@ body { @apply bg-ink text-zinc-100 antialiased; }
 
 .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* ===== Kanvas editor CV (admin) ===== */
+.cv-paper .cv-edit { outline: none; border-radius: 2px; min-width: 1ch; cursor: text; white-space: pre-wrap; transition: background-color .15s, box-shadow .15s; }
+.cv-paper .cv-block { display: block; }
+.cv-paper .cv-edit:hover { background: rgba(155, 212, 15, .13); }
+.cv-paper .cv-edit:focus { background: rgba(155, 212, 15, .2); box-shadow: 0 0 0 1px rgba(101, 163, 13, .7); }
+.cv-paper .cv-edit:empty::before { content: attr(data-placeholder); color: #a3a3a3; font-style: italic; font-weight: 400; text-transform: none; letter-spacing: 0; }
+.cv-paper .cv-opt:empty:not(:focus) { display: none; }
+.cv-paper .cv-item:hover .cv-opt:empty { display: inline-block; }
+.cv-paper .cv-item:hover .cv-opt.cv-block:empty { display: block; }
+@media (hover: none) { .cv-paper .cv-tool { opacity: 1 !important; } }

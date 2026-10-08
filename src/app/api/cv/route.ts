@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
-import { buildCv, cvFileName, parseOptions, siteOrigin } from "@/lib/cv/data";
+import { cvFileName } from "@/lib/cv/data";
+import { resolveCv } from "@/lib/cv/resolve";
 import { renderCvPdf } from "@/lib/cv/pdf";
 import { renderCvDocx } from "@/lib/cv/docx";
 
@@ -12,7 +13,7 @@ export async function POST(req: Request) {
   const body = await req.json().catch(() => ({}));
   const format = body?.format === "docx" ? "docx" : "pdf";
   try {
-    const data = await buildCv(parseOptions(body, siteOrigin(req)));
+    const { data } = await resolveCv(body, req);
     const buf = format === "docx" ? await renderCvDocx(data) : await renderCvPdf(data);
     return new NextResponse(new Uint8Array(buf), {
       headers: {

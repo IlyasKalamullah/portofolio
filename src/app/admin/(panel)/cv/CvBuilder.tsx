@@ -2,7 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
-import { CheckCircle2, Download, ExternalLink, FileText, Globe, Info, Languages, Loader2, RotateCcw, Save } from "lucide-react";
+import { CheckCircle2, Download, ExternalLink, FileText, Globe, Info, Languages, Loader2, PencilLine, RotateCcw, Save, Undo2, Eye, Cloud, CloudOff } from "lucide-react";
+import type { CvData } from "@/lib/cv/data";
+import { CvCanvas } from "./CvCanvas";
 
 type Section = "summary" | "experience" | "education" | "skills" | "projects" | "activities" | "certificates";
 const SECTIONS: { key: Section; label: string }[] = [
@@ -45,15 +47,88 @@ export function CvBuilder({
   const options = { lang, sections: SECTIONS.map((s) => s.key).filter((k) => sections.includes(k)), title, summary, projectIds, certificateIds };
   const optKey = JSON.stringify(options);
 
+  // ===== Kanvas editor =====
+  const [view, setView] = useState<"edit" | "pdf">("edit");
+  const [base, setBase] = useState<CvData | null>(null);          // CV hasil susun otomatis dari data
+  const [draft, setDraft] = useState<CvData | null>(null);        // CV hasil edit manual (disimpan per bahasa)
+  const [draftAt, setDraftAt] = useState<Date | null>(null);
+  const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [history, setHistory] = useState<CvData[]>([]);
+  const [baseLoading, setBaseLoading] = useState(true);
+  const saveTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const effective = draft ?? base;
+  const draftKey = draft ? JSON.stringify(draft) : "";
+
+  // susun CV otomatis dari opsi
+  useEffect(() => {
+    let cancel = false;
+    setBaseLoading(true);
+    const t = setTimeout(async () => {
+      try {
+        const res = await fetch("/api/cv/data", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(options) });
+        const json = await res.json();
+        if (!cancel && res.ok) setBase(json.data);
+      } finally {
+        if (!cancel) setBaseLoading(false);
+      }
+    }, 500);
+    return () => { cancel = true; clearTimeout(t); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [optKey, rev]);
+
+  // muat hasil edit manual saat bahasa berganti
+  useEffect(() => {
+    let cancel = false;
+    setDraft(null); setHistory([]); setSaveState("idle");
+    fetch(`/api/cv/draft?lang=${lang}`).then((r) => r.json()).then((j) => {
+      if (cancel) return;
+      setDraft(j.data ?? null);
+      setDraftAt(j.updatedAt ? new Date(j.updatedAt) : null);
+    }).catch(() => {});
+    return () => { cancel = true; };
+  }, [lang]);
+
+  const persist = (data: CvData) => {
+    clearTimeout(saveTimer.current);
+    setSaveState("saving");
+    saveTimer.current = setTimeout(async () => {
+      try {
+        const res = await fetch("/api/cv/draft", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ lang, data }) });
+        if (!res.ok) throw new Error();
+        setDraftAt(new Date((await res.json()).updatedAt));
+        setSaveState("saved");
+      } catch { setSaveState("error"); }
+    }, 800);
+  };
+  const onCanvasChange = (next: CvData) => {
+    if (effective) setHistory((h) => [...h.slice(-49), effective]);
+    setDraft(next);
+    persist(next);
+  };
+  const undo = () => {
+    const prev = history[history.length - 1];
+    if (!prev) return;
+    setHistory((h) => h.slice(0, -1));
+    setDraft(prev);
+    persist(prev);
+  };
+  const resetDraft = async () => {
+    if (!confirm("Hapus semua edit manual dan susun ulang CV dari data terbaru?")) return;
+    clearTimeout(saveTimer.current);
+    await fetch("/api/cv/draft", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ lang }) });
+    setDraft(null); setHistory([]); setDraftAt(null); setSaveState("idle");
+  };
+
   const request = async (format: "pdf" | "docx") => {
-    const res = await fetch("/api/cv", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...options, format }) });
+    const res = await fetch("/api/cv", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...options, format, data: draft ?? undefined }) });
     if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || "Gagal membuat CV");
     const name = /filename="([^"]+)"/.exec(res.headers.get("Content-Disposition") ?? "")?.[1] ?? `CV.${format}`;
     return { blob: await res.blob(), name };
   };
 
-  // Pratinjau PDF otomatis diperbarui (jeda 600ms setelah perubahan terakhir)
+  // Pratinjau PDF diperbarui saat tab PDF dibuka / opsi / hasil edit berubah
   useEffect(() => {
+    if (view !== "pdf") return;
     let cancel = false;
     setLoading(true);
     const t = setTimeout(async () => {
@@ -72,7 +147,7 @@ export function CvBuilder({
     }, 600);
     return () => { cancel = true; clearTimeout(t); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [optKey, rev]);
+  }, [optKey, rev, view, draftKey]);
   useEffect(() => () => { if (urlRef.current) URL.revokeObjectURL(urlRef.current); }, []);
 
   const download = async (format: "pdf" | "docx") => {
@@ -91,7 +166,7 @@ export function CvBuilder({
   const publish = async () => {
     setBusy("publish"); setMsg({});
     try {
-      const res = await fetch("/api/cv/publish", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(options) });
+      const res = await fetch("/api/cv/publish", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...options, data: draft ?? undefined }) });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error);
       if (lang === "en") setLinks((l) => ({ ...l, en: json.url })); else setLinks((l) => ({ ...l, id: json.url }));
@@ -106,6 +181,15 @@ export function CvBuilder({
     <div className="grid gap-6 xl:grid-cols-[400px_1fr]">
       {/* ===== Opsi ===== */}
       <div className="space-y-5">
+        {draft && (
+          <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-200 light:text-amber-800">
+            <p className="font-medium">Mode edit manual aktif ({lang === "en" ? "English" : "Indonesia"})</p>
+            <p className="mt-1 text-xs opacity-90">CV memakai hasil edit Anda di kanvas. Perubahan opsi & data admin di bawah baru diterapkan setelah Anda menyusun ulang.</p>
+            <button type="button" onClick={resetDraft} className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-amber-500/40 px-2.5 py-1 text-xs hover:bg-amber-500/10">
+              <RotateCcw size={12} /> Susun ulang dari data
+            </button>
+          </div>
+        )}
         <Card title="Bahasa CV">
           <div className="grid grid-cols-2 gap-2">
             {(["id", "en"] as const).map((l) => (
@@ -178,7 +262,50 @@ export function CvBuilder({
           </p>
         )}
 
-        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-ink-700">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex rounded-full border border-white/10 bg-ink-900/70 p-1" role="tablist">
+            {([["edit", "Edit di kanvas", PencilLine], ["pdf", "Pratinjau PDF", Eye]] as const).map(([k, label, Icon]) => (
+              <button key={k} type="button" role="tab" aria-selected={view === k} onClick={() => setView(k)}
+                className={clsx("inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm transition", view === k ? "bg-accent font-medium text-black" : "text-zinc-400 hover:text-white")}>
+                <Icon size={14} /> {label}
+              </button>
+            ))}
+          </div>
+          {view === "edit" && (
+            <div className="flex items-center gap-2 text-xs text-zinc-500">
+              {saveState === "saving" && <span className="inline-flex items-center gap-1"><Loader2 size={12} className="animate-spin" /> Menyimpan...</span>}
+              {saveState === "saved" && <span className="inline-flex items-center gap-1 text-accent"><Cloud size={12} /> Tersimpan</span>}
+              {saveState === "error" && <span className="inline-flex items-center gap-1 text-red-400"><CloudOff size={12} /> Gagal menyimpan</span>}
+              {saveState === "idle" && draft && draftAt && <span>Edit terakhir {draftAt.toLocaleString("id-ID", { dateStyle: "short", timeStyle: "short" })}</span>}
+              <button type="button" onClick={undo} disabled={!history.length} className="inline-flex items-center gap-1 rounded-lg border border-white/10 px-2 py-1 text-zinc-300 hover:border-accent/50 disabled:opacity-40">
+                <Undo2 size={12} /> Undo
+              </button>
+              {draft && (
+                <button type="button" onClick={resetDraft} className="inline-flex items-center gap-1 rounded-lg border border-white/10 px-2 py-1 text-zinc-300 hover:border-red-500/50 hover:text-red-400">
+                  <RotateCcw size={12} /> Reset
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+
+        {view === "edit" && (
+          <div className="relative rounded-2xl border border-white/10 bg-ink-700 p-3 sm:p-6">
+            <p className="mb-3 text-xs text-zinc-500">
+              Klik teks untuk mengedit · <b>Enter</b> = poin baru · <b>Backspace</b> di poin kosong = hapus · arahkan kursor ke item/bagian untuk memindah atau menghapus
+            </p>
+            {effective ? (
+              <CvCanvas data={effective} onChange={onCanvasChange} />
+            ) : (
+              <div className="grid h-[60vh] place-items-center text-sm text-zinc-500"><Loader2 className="animate-spin" /></div>
+            )}
+            {baseLoading && !draft && effective && (
+              <span className="absolute right-4 top-3 inline-flex items-center gap-1.5 text-xs text-zinc-500"><Loader2 size={12} className="animate-spin" /> menyusun ulang...</span>
+            )}
+          </div>
+        )}
+
+        <div className={clsx("relative overflow-hidden rounded-2xl border border-white/10 bg-ink-700", view !== "pdf" && "hidden")}>
           {preview && <iframe src={`${preview}#toolbar=0&navpanes=0&view=FitH`} title="Pratinjau CV" className="h-[78vh] min-h-[520px] w-full bg-[#fff]" />}
           {preview && (
             <a href={preview} target="_blank" rel="noreferrer" className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full bg-black/75 px-3 py-1.5 text-xs text-[#fff] backdrop-blur hover:bg-black">
