@@ -73,7 +73,8 @@ export function CvCanvas({ data, onChange }: { data: CvData; onChange: (d: CvDat
             {data.contacts.map((c, i) => (
               <span key={i} className="group/ci relative inline-flex items-center">
                 <Editable path={`c${i}`} focusPath={focusPath} setFocusPath={setFocusPath} value={c} placeholder="kontak"
-                  onCommit={(v) => update((d) => { if (v) d.contacts[i] = v; else d.contacts.splice(i, 1); })} />
+                  onCommit={(v) => update((d) => { if (v) d.contacts[i] = v; else d.contacts.splice(i, 1); })}
+                  onEmptyBlur={() => update((d) => { if (!d.contacts[i]) d.contacts.splice(i, 1); })} />
                 <MiniBtn title="Hapus kontak" className="ml-0.5 opacity-0 group-hover/ci:opacity-100" onClick={() => update((d) => { d.contacts.splice(i, 1); })}><X size={10} /></MiniBtn>
                 {i < data.contacts.length - 1 && <span className="whitespace-pre">{"  |  "}</span>}
               </span>
@@ -108,10 +109,11 @@ export function CvCanvas({ data, onChange }: { data: CvData; onChange: (d: CvDat
                 <div className="group/l relative">
                   {(sec.lines ?? []).map((l, li) => (
                     <div key={li} className="group/li relative" style={{ marginBottom: 2 * PT }}>
-                      <Editable path={`s${si}.l${li}`} focusPath={focusPath} setFocusPath={setFocusPath} value={l} placeholder="Baris..."
+                      <Editable path={`s${si}.l${li}`} focusPath={focusPath} setFocusPath={setFocusPath} value={l} placeholder="Baris kosong (jadi spasi di CV)"
                         onCommit={(v) => update((d) => { d.sections[si].lines![li] = v; })}
                         onEnter={(v) => { update((d) => { d.sections[si].lines![li] = v; d.sections[si].lines!.splice(li + 1, 0, ""); }); setFocusPath(`s${si}.l${li + 1}`); }}
-                        onBackspaceEmpty={() => { update((d) => { d.sections[si].lines!.splice(li, 1); }); setFocusPath(li > 0 ? `s${si}.l${li - 1}` : null); }} />
+                        onBackspaceEmpty={() => { update((d) => { d.sections[si].lines!.splice(li, 1); }); setFocusPath(li > 0 ? `s${si}.l${li - 1}` : null); }}
+                        style={{ display: "block" }} />
                       <MiniBtn title="Hapus baris" className="absolute -right-6 top-0.5 opacity-0 group-hover/li:opacity-100" onClick={() => update((d) => { d.sections[si].lines!.splice(li, 1); })}><X size={10} /></MiniBtn>
                     </div>
                   ))}
@@ -170,7 +172,8 @@ function ItemView({ it, si, ii, count, update, focusPath, setFocusPath }: {
           <Editable {...ed} path={`${p}.b${bi}`} value={b} placeholder="Poin..." style={{ flex: 1 }}
             onCommit={(v) => set((x) => { x.bullets[bi] = v; })}
             onEnter={(v) => { set((x) => { x.bullets[bi] = v; x.bullets.splice(bi + 1, 0, ""); }); setFocusPath(`${p}.b${bi + 1}`); }}
-            onBackspaceEmpty={() => { set((x) => { x.bullets.splice(bi, 1); }); setFocusPath(bi > 0 ? `${p}.b${bi - 1}` : null); }} />
+            onBackspaceEmpty={() => { set((x) => { x.bullets.splice(bi, 1); }); setFocusPath(bi > 0 ? `${p}.b${bi - 1}` : null); }}
+            onEmptyBlur={() => set((x) => { if (!x.bullets[bi]) x.bullets.splice(bi, 1); })} />
           <MiniBtn title="Hapus poin" className="absolute -right-6 top-0.5 opacity-0 group-hover/b:opacity-100" onClick={() => set((x) => { x.bullets.splice(bi, 1); })}><X size={10} /></MiniBtn>
         </div>
       ))}
@@ -184,12 +187,14 @@ function ItemView({ it, si, ii, count, update, focusPath, setFocusPath }: {
 
 /** Teks yang bisa diedit langsung (contentEditable, hanya teks polos). */
 function Editable({
-  value, onCommit, onEnter, onBackspaceEmpty, multiline, placeholder, optional, style, path, focusPath, setFocusPath,
+  value, onCommit, onEnter, onBackspaceEmpty, onEmptyBlur, multiline, placeholder, optional, style, path, focusPath, setFocusPath,
 }: {
   value: string;
   onCommit: (v: string) => void;
   onEnter?: (v: string) => void;
   onBackspaceEmpty?: () => void;
+  /** dipanggil jika elemen ditinggalkan dalam keadaan kosong (mis. baris/poin baru yang tidak diisi) */
+  onEmptyBlur?: () => void;
   multiline?: boolean;
   placeholder?: string;
   optional?: boolean;
@@ -242,6 +247,7 @@ function Editable({
       onInput={() => { dirty.current = true; }}
       onBlur={() => {
         const v = read();
+        if (!v && onEmptyBlur) { dirty.current = false; onEmptyBlur(); return; }
         if (dirty.current && v !== value) onCommit(v);
         dirty.current = false;
       }}

@@ -45,7 +45,7 @@ export function CvDocument({ data }: { data: CvData }) {
           <View key={sec.key} style={s.section}>
             <Text style={s.h2} minPresenceAhead={40}>{sec.label}</Text>
             {sec.text && <Text>{sec.text}</Text>}
-            {sec.lines?.map((l, i) => <Text key={i} style={s.line}>{l}</Text>)}
+            {sec.lines?.map((l, i) => <Text key={i} style={s.line}>{l || "\u00a0"}</Text>)}
             {sec.items?.map((it, i) => (
               <View key={i} style={s.item} wrap={it.bullets.length + (it.desc ? 2 : 0) > 4}>
                 <View style={s.row}>

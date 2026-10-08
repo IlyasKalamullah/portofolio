@@ -30,7 +30,8 @@ export function sanitizeCvData(raw: unknown, lang: CvLang): CvData | null {
       key,
       label: str(sec.label, 80) || "—",
       text: opt(sec.text, 3000),
-      lines: arr(sec.lines).slice(0, 40).map((l) => str(l, 400)).filter(Boolean),
+      // baris kosong dipertahankan → tampil sebagai spasi di CV
+      lines: arr(sec.lines).slice(0, 40).map((l) => str(l, 400)),
       items,
     };
   });

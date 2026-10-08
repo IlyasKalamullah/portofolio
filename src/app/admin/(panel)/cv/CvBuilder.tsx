@@ -292,7 +292,7 @@ export function CvBuilder({
         {view === "edit" && (
           <div className="relative rounded-2xl border border-white/10 bg-ink-700 p-3 sm:p-6">
             <p className="mb-3 text-xs text-zinc-500">
-              Klik teks untuk mengedit · <b>Enter</b> = poin baru · <b>Backspace</b> di poin kosong = hapus · arahkan kursor ke item/bagian untuk memindah atau menghapus
+              Klik teks untuk mengedit · <b>Enter</b> = poin/baris baru · <b>Backspace</b> di poin/baris kosong = hapus · baris kosong = spasi di CV · arahkan kursor ke item/bagian untuk memindah atau menghapus
             </p>
             {effective ? (
               <CvCanvas data={effective} onChange={onCanvasChange} />
